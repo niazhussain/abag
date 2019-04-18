@@ -1,0 +1,37 @@
+{
+  "title": "ABAG",
+  "convertor": {
+    "title": "Convertor",
+    "convert": "Convert",
+    "form": {
+      "currency": {
+        "label": "Choose a currency pair..."
+      },
+      "rate": {
+        "label": "Currency rate",
+        "min": "Rate should be bigger than",
+        "max": "Rate should be lower than"
+      },
+      "count": {
+        "label": "Count to convert",
+        "min": "Count should be bigger than 0"
+      }
+    },
+    "success": "You receive"
+  },
+  "rates": {
+    "title": "Currency rates",
+    "table": {
+      "name": "Currency pair",
+      "ask": "Sell price",
+      "bid": "Buy price",
+      "favorites": "Favorites"
+    },
+    "sort": "Sort"
+  },
+  "error": {
+    "title": "Server error",
+    "message": "Something went wrong, we reload this request for you after closing this dialog, but you always can try to visit this page later",
+    "ok": "Reload"
+  }
+}
