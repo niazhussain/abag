@@ -23,4 +23,4 @@ ENTRYPOINT [ "npm", "run", "start" ]
 # >> docker image build -t abag .
 
 # To make image run as container use command below
-# >> docker run -p 80:80 -d abag
+# >> docker run -p 3000:80 -d abag
