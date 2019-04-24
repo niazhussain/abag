@@ -12,6 +12,7 @@ export function Market(
       order: 'desc',
       orderBy: 'name',
     },
+    defaultCurrency: null,
   },
   action: AnyAction,
 ): IMarketStore {
@@ -45,6 +46,11 @@ export function Market(
 
           return item;
         }),
+      };
+    case actions.SET_DEFAULT_SUCCESS:
+      return {
+        ...state,
+        defaultCurrency: action.name,
       };
     case actions.SET_SORTING:
       let order: 'desc' | 'asc' = 'desc';

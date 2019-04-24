@@ -2,6 +2,8 @@
 
 Is a crypto currency convertor with a list of crypto currencies rates.
 
+This project well tested on Chrome 67.0.3396.62 / Linux
+
 ### Additional features
 
 - Sorting of crypto currencies list

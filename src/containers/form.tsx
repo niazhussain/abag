@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, SyntheticEvent, useEffect } from 'react';
 import {
   combineValidators,
   min,
@@ -10,28 +10,54 @@ import { Translation } from './translation';
 import { Select } from '../components/atoms/select';
 import { Field } from '../components/atoms/field';
 import { DoubleFieldArea } from '../components/atoms/double-field-area';
-import { MenuItem } from '@material-ui/core';
+import { MenuItem, Button } from '@material-ui/core';
 import { TextField } from 'final-form-material-ui/src';
 import { SubmitButton } from '../components/atoms/submit-button';
 import { connect } from 'react-redux';
 import { IStore } from '../interfaces/store';
+import { Dispatch, AnyAction, bindActionCreators } from 'redux';
+import { SET_DEFAULT, defaultCurrencyKey } from '../store/actions/market';
+import { IMarketStore } from '../interfaces/marketStore';
+import { FormApi } from 'final-form';
+import { ButtonFieldArea } from '../components/atoms/button-field-area';
 
-export const Form = connect(mapStateToProps)((props) => {
+export interface ParentProps {
+  form: FormApi;
+  handleSubmit: (event?: SyntheticEvent<HTMLFormElement>) => void;
+}
+
+export const Form = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)((props: IMarketStore & ParentProps & { setDefault: typeof SET_DEFAULT }) => {
   const [selectedValue, setSelectedValue] = useState(
-    props.data[0] && props.data[0].MarketName,
+    props.defaultCurrency || (props.data[0] && props.data[0].MarketName),
   );
 
-  const onChange = (value: string) => {
-    setSelectedValue(value);
-    props.form.mutators.setBaseRate(
-      props.data.find((item: IMarketItem) => item.MarketName === value).Bid,
-    );
-    return value;
-  };
+  const [isDirty, setDirty] = useState(false);
 
   const currentItem = props.data.find(
     (item: IMarketItem) => item.MarketName === selectedValue,
   );
+
+  useEffect(() => {
+    let defaultCurrency: string = props.defaultCurrency;
+
+    if (typeof localStorage !== 'undefined') {
+      defaultCurrency = localStorage.getItem(defaultCurrencyKey);
+      if (defaultCurrency !== props.defaultCurrency) {
+        props.setDefault(defaultCurrency);
+      }
+    }
+
+    if (!isDirty && defaultCurrency && defaultCurrency !== selectedValue) {
+      setSelectedValue(props.defaultCurrency);
+    }
+  }, [props.defaultCurrency, isDirty]);
+
+  if (!currentItem) {
+    return null;
+  }
 
   const rateValidation = setValidationMessagesOnFirstError(
     {
@@ -58,22 +84,43 @@ export const Form = connect(mapStateToProps)((props) => {
     combineValidators([min(0, true)]),
   );
 
+  const handleClickOnSetDefault = () => {
+    props.setDefault(currentItem.MarketName);
+  };
+
+  const onChange = (value: string) => {
+    setSelectedValue(value);
+    setDirty(true);
+    props.form.mutators.setBaseRate(
+      props.data.find((item: IMarketItem) => item.MarketName === value).Bid,
+    );
+    return value;
+  };
+
   return (
     <form onSubmit={props.handleSubmit}>
-      <Field
-        component={Select as any}
-        defaultValue={selectedValue}
-        name="marketName"
-        parse={onChange}
-      >
-        {props.data.map((item: IMarketItem) => {
-          return (
-            <MenuItem value={item.MarketName} key={item.MarketName}>
-              {item.MarketName}
-            </MenuItem>
-          );
-        })}
-      </Field>
+      <ButtonFieldArea>
+        <Field
+          component={Select as any}
+          defaultValue={selectedValue}
+          name="marketName"
+          parse={onChange}
+        >
+          {props.data.map((item: IMarketItem) => {
+            return (
+              <MenuItem value={item.MarketName} key={item.MarketName}>
+                {item.MarketName}
+              </MenuItem>
+            );
+          })}
+        </Field>
+        <Button
+          onClick={handleClickOnSetDefault}
+          disabled={props.defaultCurrency === selectedValue}
+        >
+          <Translation translateKey="convertor.setDefault" />
+        </Button>
+      </ButtonFieldArea>
       <DoubleFieldArea>
         <Field
           required={true}
@@ -113,9 +160,18 @@ export const Form = connect(mapStateToProps)((props) => {
   );
 });
 
-function mapStateToProps(store: IStore, props: any) {
+function mapStateToProps(store: IStore, props: ParentProps) {
   return {
     ...props,
     ...store.Market,
   };
+}
+
+function mapDispatchToProps(dispatch: Dispatch<AnyAction>) {
+  return bindActionCreators(
+    {
+      setDefault: SET_DEFAULT,
+    },
+    dispatch,
+  );
 }

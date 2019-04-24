@@ -3,6 +3,7 @@
   "convertor": {
     "title": "Convertor",
     "convert": "Convert",
+    "setDefault": "Set as default",
     "form": {
       "currency": {
         "label": "Choose a currency pair..."

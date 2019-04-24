@@ -14,6 +14,13 @@ import { Form } from '../containers/form';
 import { withHandleError } from '../containers/handle-error';
 import { LOAD_MARKET_ITEMS } from '../store/actions/market';
 import { IMarketStore } from '../interfaces/marketStore';
+import { connect } from 'react-redux';
+import {
+  bindActionCreators,
+  AnyAction,
+  Dispatch as ReduxDispatch,
+} from 'redux';
+import { IStore } from '../interfaces/store';
 
 const snackbarPosition = { vertical: 'top', horizontal: 'center' };
 
@@ -81,4 +88,22 @@ const Currency = withHandleError((props: CurrencyProps & IMarketStore) => {
 
 Currency.getInitialProps = combineHooks([loadMarketItems, loadTranslation]);
 
-export default Currency;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Currency);
+
+function mapStateToProps(store: IStore) {
+  return {
+    ...store.Market,
+  };
+}
+
+function mapDispatchToProps(dispatch: ReduxDispatch<AnyAction>) {
+  return bindActionCreators(
+    {
+      refresh: LOAD_MARKET_ITEMS,
+    },
+    dispatch,
+  );
+}

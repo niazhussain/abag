@@ -10,7 +10,10 @@ export const actions = {
   LOAD_MARKET_ITEMS_START: 'LOAD_MARKET_ITEMS_START',
   SET_FAVORITE_SUCCESS: 'SET_FAVORITE_SUCCESS',
   SET_SORTING: 'SET_SORTING',
+  SET_DEFAULT_SUCCESS: 'SET_DEFAULT_SUCCESS',
 };
+
+export const defaultCurrencyKey = 'defaultCurrency';
 
 export const LOAD_MARKET_ITEMS_SUCCESS = (data: IMarketItem[]) => ({
   type: actions.LOAD_MARKET_ITEMS_SUCCESS,
@@ -93,5 +96,19 @@ export const SET_FAVORITE = (
     }
 
     dispatch(SET_FAVORITE_SUCCESS(MarketName, state));
+  };
+};
+
+export const SET_DEFAULT_SUCCESS = (MarketName: string) => ({
+  type: actions.SET_DEFAULT_SUCCESS,
+  name: MarketName,
+});
+
+export const SET_DEFAULT = (
+  MarketName: string,
+): ThunkAction<void, {}, {}, AnyAction> => {
+  return (dispatch) => {
+    localStorage.setItem(defaultCurrencyKey, MarketName);
+    dispatch(SET_DEFAULT_SUCCESS(MarketName));
   };
 };

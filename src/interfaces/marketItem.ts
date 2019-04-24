@@ -13,4 +13,5 @@ export interface IMarketItem {
   PrevDay: number;
   Created: string;
   favorite?: boolean;
+  defaultCurrency?: boolean;
 }
